@@ -1,0 +1,92 @@
+USE hr_attrition;
+
+SELECT COUNT(*) FROM employees;
+DESCRIBE employees;
+
+/* Query 1 — Attrition Overview by Department & Role
+"Which departments and job roles have the highest attrition rates?" */ 
+SELECT 
+  Department,
+  JobRole,
+  COUNT(*) AS total_employees,
+  SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) AS attrition_count,
+  ROUND(SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS attrition_rate_pct
+FROM employees
+GROUP BY Department, JobRole
+ORDER BY attrition_rate_pct DESC;
+
+-- Query 2 — Overtime & Attrition
+-- "Does working overtime drive employees to leave?"
+SELECT 
+  OverTime,
+  COUNT(*) AS total_employees,
+  SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) AS attrition_count,
+  ROUND(SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS attrition_rate_pct
+FROM employees
+GROUP BY OverTime
+ORDER BY attrition_rate_pct DESC;
+
+-- Query 3 — Compensation & Satisfaction vs Attrition
+-- "Are low earners and dissatisfied employees leaving at higher rates?"
+SELECT 
+  CASE 
+    WHEN MonthlyIncome < 3000 THEN 'Low (<3K)'
+    WHEN MonthlyIncome BETWEEN 3000 AND 6000 THEN 'Mid (3K-6K)'
+    WHEN MonthlyIncome BETWEEN 6001 AND 10000 THEN 'High (6K-10K)'
+    ELSE 'Very High (10K+)'
+  END AS income_band,
+  JobSatisfaction,
+  COUNT(*) AS total_employees,
+  SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) AS attrition_count,
+  ROUND(SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS attrition_rate_pct
+FROM employees
+GROUP BY income_band, JobSatisfaction
+ORDER BY attrition_rate_pct DESC;
+
+-- Query 4 — Tenure & Age Risk Bands
+-- "Which age groups and tenure bands are most at flight risk?"
+SELECT 
+  CASE 
+    WHEN Age < 25 THEN 'Under 25'
+    WHEN Age BETWEEN 25 AND 34 THEN '25-34'
+    WHEN Age BETWEEN 35 AND 44 THEN '35-44'
+    WHEN Age BETWEEN 45 AND 54 THEN '45-54'
+    ELSE '55+'
+  END AS age_band,
+  CASE 
+    WHEN YearsAtCompany <= 2 THEN '0-2 yrs'
+    WHEN YearsAtCompany BETWEEN 3 AND 5 THEN '3-5 yrs'
+    WHEN YearsAtCompany BETWEEN 6 AND 10 THEN '6-10 yrs'
+    ELSE '10+ yrs'
+  END AS tenure_band,
+  COUNT(*) AS total_employees,
+  SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) AS attrition_count,
+  ROUND(SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS attrition_rate_pct
+FROM employees
+GROUP BY age_band, tenure_band
+ORDER BY attrition_rate_pct DESC;
+
+-- Query 5 — Attrition Score (Multi-factor)
+-- "Which current employees show the most combined risk factors?"
+SELECT 
+  EmployeeNumber,
+  Age,
+  Department,
+  JobRole,
+  MonthlyIncome,
+  YearsAtCompany,
+  JobSatisfaction,
+  OverTime,
+  BusinessTravel,
+  (
+    CASE WHEN OverTime = 'Yes' THEN 2 ELSE 0 END +
+    CASE WHEN JobSatisfaction <= 2 THEN 2 ELSE 0 END +
+    CASE WHEN MonthlyIncome < 3000 THEN 2 ELSE 0 END +
+    CASE WHEN YearsAtCompany <= 2 THEN 1 ELSE 0 END +
+    CASE WHEN BusinessTravel = 'Travel_Frequently' THEN 1 ELSE 0 END +
+    CASE WHEN Age < 30 THEN 1 ELSE 0 END
+  ) AS flight_risk_score
+FROM employees
+WHERE Attrition = 'No'
+ORDER BY flight_risk_score DESC
+LIMIT 20;
