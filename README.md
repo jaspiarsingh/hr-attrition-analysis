@@ -92,7 +92,7 @@ hr-attrition-analysis/
 
 ## Dashboard Preview
 
-[![HR Attrition Dashboard](dashboard/dashboard_screenshot.png)](https://public.tableau.com/views/HrAttritionAnalysis_17811100713140/Dashboard1)
+[![HR Attrition Dashboard](dashboard/dashboard.png)](https://public.tableau.com/views/HrAttritionAnalysis_17811100713140/Dashboard1)
 
 ---
 
