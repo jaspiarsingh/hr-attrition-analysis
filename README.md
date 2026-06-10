@@ -67,29 +67,6 @@ Full queries available in the [`/sql`](/sql) folder.
 
 ---
 
-## Project Structure
-
-```
-hr-attrition-analysis/
-│
-├── sql/
-│   ├── 01_attrition_by_role.sql
-│   ├── 02_overtime_attrition.sql
-│   ├── 03_compensation_satisfaction.sql
-│   ├── 04_tenure_age_risk.sql
-│   └── 05_flight_risk_scorecard.sql
-│
-├── python/
-│   └── import_hr.py
-│
-├── dashboard/
-│   └── dashboard_screenshot.png
-│
-└── README.md
-```
-
----
-
 ## Dashboard Preview
 
 [![HR Attrition Dashboard](dashboard/dashboard.png)](https://public.tableau.com/views/HrAttritionAnalysis_17811100713140/Dashboard1)
